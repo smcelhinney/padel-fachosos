@@ -6,9 +6,11 @@
 <style>
 :root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#17231e;background:#f3f6f2;--green:#176b4d;--lime:#c9f36a;--line:#dce5dd}
 *{box-sizing:border-box}body{margin:0}header{background:#123d30;color:white;padding:22px 18px 18px}header small{color:#c9f36a;font-weight:700;letter-spacing:.12em}h1{font-size:1.8rem;margin:6px 0}header p{margin:0;color:#d7e6dd;font-size:.95rem}.wrap{max-width:900px;margin:auto;padding:16px}.tabs{display:flex;gap:8px;overflow:auto;margin:0 0 16px}.tabs button{border:1px solid var(--line);background:white;border-radius:999px;padding:10px 15px;font-weight:700;white-space:nowrap;color:#345}.tabs button.active{background:var(--green);color:white;border-color:var(--green)}.panel{display:none}.panel.active{display:block}.card{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:13px;box-shadow:0 3px 12px #173d3010}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.between{justify-content:space-between}.muted{color:#66756d;font-size:.9rem}.pill{background:#eaf5ed;color:#176b4d;border-radius:999px;padding:5px 9px;font-size:.78rem;font-weight:700}.match{border:1px solid var(--line);border-radius:13px;padding:13px;margin-top:10px}.teams{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}.team{font-weight:750}.team.right{text-align:right}.vs{color:#819087;font-size:.8rem}.scoregrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}.scoregrid label{font-size:.78rem;color:#68776e;display:block;margin-bottom:4px}.scoregrid input{width:100%;padding:10px 7px;border:1px solid #cbd8ce;border-radius:9px;font-size:1rem;text-align:center}.btn{border:0;border-radius:10px;padding:11px 14px;background:var(--green);color:white;font-weight:750;cursor:pointer}.btn.secondary{background:#eaf2ec;color:#245441}.btn.danger{background:#fff0ed;color:#9b3227}.btn:active{transform:scale(.98)}input,select{font:inherit}.field{width:100%;padding:10px;border:1px solid #cbd8ce;border-radius:9px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:.88rem}th,td{padding:10px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}th:first-child,td:first-child{text-align:left}th{color:#637168;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em}.rank{display:inline-grid;place-items:center;width:25px;height:25px;border-radius:8px;background:#eaf5ed;font-weight:800;margin-right:7px}.playeredit{display:grid;grid-template-columns:1fr 1fr;gap:9px}.notice{background:#f6f9df;border:1px solid #e4ecb1;padding:12px;border-radius:12px;font-size:.88rem}.empty{padding:22px;text-align:center;color:#6b786f}.footer{font-size:.78rem;color:#728077;text-align:center;padding:14px}@media(max-width:520px){header{padding:19px 16px}.wrap{padding:12px}.card{padding:13px}.scoregrid{gap:5px}.scoregrid input{padding:9px 3px}.team{font-size:.9rem}.playeredit{grid-template-columns:1fr}}
+.auth-gate{position:fixed;inset:0;background:#f3f6f2;display:flex;align-items:center;justify-content:center;z-index:1000}.auth-gate.hidden{display:none}.auth-card{background:white;padding:24px;border-radius:16px;box-shadow:0 6px 24px #173d3018;width:min(360px,90vw)}.auth-card h2{margin:0 0 12px;color:#123d30}.auth-card input{width:100%;margin:8px 0;padding:10px;border:1px solid #cbd8ce;border-radius:9px;font:inherit}.auth-card button{width:100%;margin-top:8px}.auth-error{color:#9b3227;font-size:.85rem;min-height:1.2em}
 </style>
 </head>
 <body>
+<div id="authGate" class="auth-gate"><div class="auth-card"><h2>Acceso</h2><input id="authUser" placeholder="Usuario" autocomplete="username"><input id="authPass" type="password" placeholder="Contraseña" autocomplete="current-password"><button class="btn" id="authBtn">Entrar</button><p id="authError" class="auth-error"></p></div></div>
 <header><div class="wrap" style="padding:0"><small>TORNEO AMATEUR · 8 JUGADORES</small><h1>🎾 Pádel Fachosos Amorosos</h1><p>Resultados rápidos, parejas manuales y ranking individual.</p></div></header>
 <main class="wrap">
 <nav class="tabs" aria-label="Secciones">
@@ -28,7 +30,7 @@
 <div class="card"><div class="row between"><div><strong>Parejas de la jornada</strong><div class="muted">Edita las combinaciones a mano tras cada sorteo.</div></div></div><div id="teamEditor"></div><button class="btn" id="saveTeams" style="margin-top:12px">Guardar parejas</button><div class="notice" style="margin-top:12px">Consejo: cambiad las parejas cada tres jornadas. El historial conserva con quién jugó cada persona.</div></div>
 </section>
 <section id="historial" class="panel"><div class="card"><div class="row between"><div><strong>Historial de partidos</strong><div class="muted">Puedes revisar jornadas anteriores.</div></div><button class="btn danger" id="reset">Reiniciar demo</button></div><div id="historyList"></div></div></section>
-<div class="footer">Demo guardada en este navegador · no está publicada en internet.</div>
+<div class="footer">Demo guardada en este navegador · no está publicada en internet. <button class="btn secondary" id="logoutBtn" style="margin-left:8px;padding:6px 10px;font-size:.78rem">Cerrar sesión</button></div>
 </main>
 <script>
 const initialPlayers=["Fernando","Chema","Guille","Tony","José Carlos","Migue","Miguel Ángel","Tom"];
@@ -65,6 +67,14 @@ document.getElementById("savePlayers").onclick=()=>{document.querySelectorAll("[
 document.getElementById("saveTeams").onclick=()=>{let r=current(),teams=[];document.querySelectorAll("[data-team]").forEach(el=>{let i=+el.dataset.team,j=+el.dataset.member;teams[i]=teams[i]||[];teams[i][j]=+el.value});if(teams.flat().length!==8||new Set(teams.flat()).size!==8){alert("Cada jornada debe tener a los ocho jugadores una sola vez. Revisa las parejas.");return}r.teams=teams;r.matches=matchups(teams,blockRound(r.id),r.matches);persist()};
 document.getElementById("historyList").addEventListener("click",e=>{let b=e.target.closest("[data-open-round]");if(b){state.round=+b.dataset.openRound;document.querySelector('[data-tab="jornada"]').click();render()}});
 document.getElementById("reset").onclick=()=>{if(confirm("¿Borrar todos los resultados y volver al inicio de la demo?")){state=fresh();persist()}};
+const AUTH_KEY="padelAuth";
+function isAuthed(){return localStorage.getItem(AUTH_KEY)==="1"}
+function hideAuth(){document.getElementById("authGate").classList.add("hidden")}
+function showAuth(){document.getElementById("authGate").classList.remove("hidden")}
+document.getElementById("authBtn").onclick=()=>{const u=document.getElementById("authUser").value.trim();const p=document.getElementById("authPass").value;if(u==="tomas"&&p==="tomas"){localStorage.setItem(AUTH_KEY,"1");hideAuth();}else{document.getElementById("authError").textContent="Usuario o contraseña incorrectos.";}};
+document.getElementById("authPass").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("authBtn").click();});
+if(isAuthed())hideAuth();else showAuth();
+document.getElementById("logoutBtn").onclick=()=>{localStorage.removeItem(AUTH_KEY);location.reload();};
 load();
 </script>
 </body></html>
