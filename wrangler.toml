@@ -1,0 +1,8 @@
+name = "padel-fachosos"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+account_id = "9b62c4d65308a6e6218db64eafa38fd0"
+
+[assets]
+directory = "."
+binding = "ASSETS"
