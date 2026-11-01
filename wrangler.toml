@@ -3,6 +3,11 @@ main = "worker.js"
 compatibility_date = "2025-01-01"
 account_id = "9b62c4d65308a6e6218db64eafa38fd0"
 
+[[d1_databases]]
+binding = "DB"
+database_name = "padel-fachosos-db"
+database_id = "b20009e6-9ca5-4901-a715-78a593b872da"
+
 [assets]
 directory = "."
 binding = "ASSETS"

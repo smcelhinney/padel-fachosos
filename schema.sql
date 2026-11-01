@@ -1,0 +1,18 @@
+CREATE TABLE IF NOT EXISTS state (
+  id TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS standings (
+  player_id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  sets INTEGER NOT NULL DEFAULT 0,
+  sets_lost INTEGER NOT NULL DEFAULT 0,
+  matches INTEGER NOT NULL DEFAULT 0,
+  wins INTEGER NOT NULL DEFAULT 0,
+  losses INTEGER NOT NULL DEFAULT 0,
+  games INTEGER NOT NULL DEFAULT 0,
+  games_lost INTEGER NOT NULL DEFAULT 0,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
